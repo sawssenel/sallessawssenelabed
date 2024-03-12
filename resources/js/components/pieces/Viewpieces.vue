@@ -1,0 +1,88 @@
+<template>
+<div >
+<div v-if="isLoading">
+<h2> Loading .... </h2>
+</div>
+<div v-else class="py-6">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+<div class="container-fluid">
+<router-link :to="{name: 'Addpiece'}" class="btn btn-outline-light">
+<i class="fa-solid fa-square-plus"></i> New Piece
+</router-link>
+</div>
+</nav>
+<table class="table table-striped shadow">
+<thead>
+<tr>
+<!--<th scope="col">Image</th>-->
+<th scope="col">titre</th>
+<th scope="col">flyer</th> 
+<th scope="col">Modifier</th>
+<th scope="col">Supprimer</th>
+</tr>
+</thead>
+<tbody>
+<tr v-for="art in pieces" :key="art.id">
+    <td><img :src="art.imageart" width="70"
+height="80"/> </td>
+<td>{{ art.titre }}</td>
+<td>{{ art.flyer }}</td>
+<td>{{ art.marque }}</td>
+
+<td>
+    
+ <router-link :to="{name: 'editpiece', params: { id: art.id }}" class="btn btn-outline-primary mx-2">
+<i class="fa-solid fa-pen-to-square"></i>
+
+Edit
+
+ </router-link>
+ </td>
+
+
+<td><button class="btn btn-outline-danger mx-2"
+@click="deletepiece(art.id)">
+<i class="fa-solid fa-trash-can"></i>
+Delete
+</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</template>
+
+<script setup>
+import { ref,onMounted } from 'vue';
+import axios from 'axios';
+const pieces=ref([])
+const isLoading=ref(true)
+const getpieces=async()=>{
+await axios.get("http://localhost:8000/api/pieces")
+.then(res=>{
+pieces.value=res.data
+isLoading.value=false
+})
+.catch(error=>{
+console.log(error)
+})
+}
+onMounted(() => {
+getpieces();
+});
+const deletepiece=async(id)=>{
+
+    if (window.confirm("Etes-vous sûr de vouloir supprimer ?")) {
+try{
+    await axios.delete(`http://localhost:8000/api/pieces/${id}`)
+getpieces()
+
+} catch (error) {
+console.log(error)
+}
+    }
+}
+</script>
+<style lang="scss" scoped>
+</style>
